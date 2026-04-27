@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor de Blog - Franco RPG</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .editor-container {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .editor-main {
+      background: linear-gradient(145deg, var(--color-bg-tertiary), var(--color-bg-secondary));
+      border: 1px solid var(--color-border);
+      border-radius: 1rem;
+      padding: 2rem;
+    }
+
+    .editor-sidebar {
+      background: linear-gradient(145deg, var(--color-bg-tertiary), var(--color-bg-secondary));
+      border: 1px solid var(--color-border);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      height: fit-content;
+    }
+
+    .editor-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-group label {
+      color: var(--color-gold);
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      padding: 0.75rem;
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: 0.5rem;
+      color: var(--color-text);
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+    }
+
+    .form-group textarea {
+      min-height: 300px;
+      resize: vertical;
+    }
+
+    .image-preview {
+      width: 100px;
+      height: 100px;
+      border-radius: 0.5rem;
+      background: var(--color-bg-secondary);
+      border: 2px dashed var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .image-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .posts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .post-item {
+      padding: 1rem;
+      background: var(--color-bg-secondary);
+      border-left: 3px solid var(--color-gold);
+      border-radius: 0.3rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .post-item:hover {
+      background: rgba(212, 175, 55, 0.1);
+    }
+
+    .editor-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .btn-action {
+      flex: 1;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn-save { background: var(--color-gold); color: var(--color-bg-primary); }
+    .btn-publish { background: var(--color-crimson); color: white; }
+    .btn-new { background: var(--color-text-muted); color: white; margin-bottom: 1rem; width: 100%; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container">
+      <div class="navbar-content">
+        <a href="/" class="logo">⚔️ FRANCO RPG</a>
+        <div class="nav-links">
+          <a href="/" class="nav-link">Início</a>
+          <a href="/blog" class="nav-link">Blog</a>
+          <a href="/perfil" class="nav-link">Perfil</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <section class="section" style="margin-top: 70px;">
+    <div class="container">
+      <h1 class="section-title">📝 Editor de Blog</h1>
+      
+      <div class="editor-container">
+        <div class="editor-main">
+          <button class="btn-action btn-new" onclick="clearForm()">+ Novo Post</button>
+          <form class="editor-form" id="blogForm">
+            <div class="form-group">
+              <label>Título</label>
+              <input type="text" id="postTitle" required>
+            </div>
+            <div class="form-group">
+              <label>Slug (URL)</label>
+              <input type="text" id="postSlug" required>
+            </div>
+            <div class="form-group">
+              <label>Categoria</label>
+              <select id="postCategory" required>
+                <option value="Geral">Geral</option>
+                <option value="Dicas">Dicas</option>
+                <option value="História">História</option>
+                <option value="Eventos">Eventos</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Resumo</label>
+              <input type="text" id="postExcerpt" required>
+            </div>
+            <div class="form-group">
+              <label>Imagem de Capa</label>
+              <div style="display: flex; gap: 1rem; align-items: center;">
+                <div class="image-preview" id="coverPreview">📷</div>
+                <input type="file" id="coverInput" accept="image/*" onchange="uploadCover(event)">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Conteúdo</label>
+              <textarea id="postContent" required></textarea>
+            </div>
+            <div class="editor-actions">
+              <button type="button" class="btn-action btn-save" onclick="savePost(0)">💾 Salvar Rascunho</button>
+              <button type="button" class="btn-action btn-publish" onclick="savePost(1)">🚀 Publicar</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="editor-sidebar">
+          <h3 style="color: var(--color-gold); margin-bottom: 1rem;">Todos os Posts</h3>
+          <div class="posts-list" id="postsList"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="/js/main.js"></script>
+  <script>
+    let currentPostId = null;
+    let coverImageUrl = null;
+
+    async function checkAccess() {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user) { window.location.href = '/'; return; }
+      
+      const res = await fetch(`/api/profile/${user.id || user.userId}`);
+      const profile = await res.json();
+      
+      if (profile.role !== 'admin' && profile.can_edit_blog !== 1) {
+        alert('Acesso negado!');
+        window.location.href = '/perfil';
+      }
+    }
+
+    async function uploadCover(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      const data = await res.json();
+      coverImageUrl = data.url;
+      document.getElementById('coverPreview').innerHTML = `<img src="${data.url}">`;
+    }
+
+    async function savePost(published) {
+      const user = JSON.parse(localStorage.getItem('user'));
+      const postData = {
+        title: document.getElementById('postTitle').value,
+        slug: document.getElementById('postSlug').value,
+        excerpt: document.getElementById('postExcerpt').value,
+        content: document.getElementById('postContent').value,
+        category: document.getElementById('postCategory').value,
+        cover_image: coverImageUrl,
+        author_id: user.id || user.userId,
+        published: published
+      };
+
+      const url = currentPostId ? `/api/blog/${currentPostId}` : '/api/blog';
+      const method = currentPostId ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(postData)
+      });
+
+      if (res.ok) {
+        alert('Post salvo!');
+        loadPosts();
+        if (!currentPostId) clearForm();
+      }
+    }
+
+    async function loadPosts() {
+      const res = await fetch('/api/admin/blog-all'); // Vou criar essa rota no server
+      const posts = await res.json();
+      const list = document.getElementById('postsList');
+      list.innerHTML = posts.map(p => `
+        <div class="post-item" onclick="loadPost(${p.id})">
+          <div style="color: var(--color-gold); font-weight: 700;">${p.title}</div>
+          <div style="font-size: 0.7rem; color: var(--color-text-muted);">${p.published ? 'Publicado' : 'Rascunho'}</div>
+        </div>
+      `).join('');
+    }
+
+    async function loadPost(id) {
+      const res = await fetch(`/api/blog/${id}`);
+      const p = await res.json();
+      currentPostId = p.id;
+      document.getElementById('postTitle').value = p.title;
+      document.getElementById('postSlug').value = p.slug;
+      document.getElementById('postExcerpt').value = p.excerpt;
+      document.getElementById('postContent').value = p.content;
+      document.getElementById('postCategory').value = p.category;
+      coverImageUrl = p.cover_image;
+      if (p.cover_image) {
+        document.getElementById('coverPreview').innerHTML = `<img src="${p.cover_image}">`;
+      } else {
+        document.getElementById('coverPreview').innerHTML = '📷';
+      }
+      window.scrollTo(0, 0);
+    }
+
+    function clearForm() {
+      currentPostId = null;
+      coverImageUrl = null;
+      document.getElementById('blogForm').reset();
+      document.getElementById('coverPreview').innerHTML = '📷';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAccess();
+      loadPosts();
+    });
+  </script>
+</body>
+</html>
