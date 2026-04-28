@@ -319,9 +319,18 @@ app.get('/api/blog', async (req, res) => {
   res.json(data || []);
 });
 
-// GET post individual
-app.get('/api/blog/:id', async (req, res) => {
-  const { data, error } = await supabase.from('blog_posts').select('*').eq('id', req.params.id).single();
+// GET post individual (por slug ou ID)
+app.get('/api/blog/:identifier', async (req, res) => {
+  const { identifier } = req.params;
+  let query = supabase.from('blog_posts').select('*');
+  
+  if (!isNaN(identifier)) {
+    query = query.eq('id', identifier);
+  } else {
+    query = query.eq('slug', identifier);
+  }
+
+  const { data, error } = await query.single();
   if (error || !data) return res.status(404).json({ error: 'Post não encontrado' });
   res.json(data);
 });
@@ -427,8 +436,16 @@ app.delete('/api/admin/users/:id', async (req, res) => {
 
 // ── Heróis ────────────────────────────────────────────────────────────────────
 app.get('/api/heroes', async (req, res) => {
-  const { data } = await supabase.from('heroes').select('*').eq('active', 1).order('order');
+  // Removi o filtro de 'active' e 'order' para garantir que os heróis apareçam
+  const { data, error } = await supabase.from('heroes').select('*').order('name', { ascending: true });
+  if (error) return res.status(500).json({ error: 'Erro ao carregar heróis' });
   res.json(data || []);
+});
+
+app.get('/api/heroes/:id', async (req, res) => {
+  const { data, error } = await supabase.from('heroes').select('*').eq('id', req.params.id).single();
+  if (error || !data) return res.status(404).json({ error: 'Herói não encontrado' });
+  res.json(data);
 });
 
 app.post('/api/heroes', upload.single('avatar'), async (req, res) => {
@@ -442,8 +459,19 @@ app.post('/api/heroes', upload.single('avatar'), async (req, res) => {
   res.json({ success: true, id: data[0].id });
 });
 
+app.put('/api/heroes/:id', upload.single('avatar'), async (req, res) => {
+  const { name, role, handle, bio, years_playing, years_narrating, highlights } = req.body;
+  const updateData = { name, role, handle, bio, years_playing, years_narrating, highlights };
+  if (req.file) updateData.avatar_url = `/uploads/${req.file.filename}`;
+
+  const { error } = await supabase.from('heroes').update(updateData).eq('id', req.params.id);
+  if (error) return res.status(500).json({ error: 'Erro ao atualizar herói' });
+  res.json({ success: true });
+});
+
 app.delete('/api/heroes/:id', async (req, res) => {
-  const { error } = await supabase.from('heroes').update({ active: 0 }).eq('id', req.params.id);
+  // Agora deleta de verdade em vez de apenas desativar
+  const { error } = await supabase.from('heroes').delete().eq('id', req.params.id);
   res.json({ success: !error });
 });
 
