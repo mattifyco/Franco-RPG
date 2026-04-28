@@ -371,22 +371,126 @@ font-size:.9rem;
   box-shadow: 0 0 20px rgba(139, 46, 46, 0.4);
 }
 
+/* ─── User Dropdown & Mobile Adjustments ────────────────────────────────────── */
+
+.user-menu {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-avatar-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: var(--transition);
+}
+
+.nav-avatar-btn:hover {
+  transform: scale(1.05);
+}
+
+.user-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 10px;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  padding: 0.5rem;
+  min-width: 180px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  z-index: 1000;
+}
+
+.user-dropdown.active {
+  display: flex;
+  animation: fadeInDown 0.2s ease-out;
+}
+
+.dropdown-item {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  background: none;
+  border: none;
+  color: var(--color-text);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dropdown-item:hover {
+  background: rgba(212, 175, 55, 0.1);
+  color: var(--color-gold);
+}
+
+.dropdown-item.logout {
+  color: var(--color-crimson);
+}
+
+.dropdown-item.logout:hover {
+  background: rgba(139, 0, 0, 0.1);
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @media (max-width: 768px) {
   .user-menu {
-    flex-direction: column;
+    flex-direction: row; /* Mantém horizontal no mobile */
     gap: 0.5rem;
-    width: 100%;
+    width: auto;
   }
   
   .user-name {
-    width: 100%;
-    text-align: center;
+    display: none; /* Esconde nome no mobile para dar espaço */
   }
-  
-  .btn-profile,
-  .btn-admin,
-  .btn-logout {
-    width: 100%;
+
+  /* Admin Mobile Adjustments */
+  .admin-container {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-sidebar {
+    display: block !important;
+    margin-bottom: 1rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .admin-menu {
+    flex-direction: row !important;
+    gap: 10px;
+    padding-bottom: 10px;
+    display: flex !important;
+  }
+
+  .admin-menu-item {
+    white-space: nowrap;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    border-left: none !important;
+    border-bottom: 3px solid transparent;
+  }
+
+  .admin-menu-item.active {
+    border-bottom-color: var(--color-gold);
   }
 }
 

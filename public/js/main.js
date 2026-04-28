@@ -27,16 +27,20 @@ function updateNavAuth() {
 
   if (currentUser) {
     const avatarHtml = currentUser.avatar 
-      ? `<img src="${currentUser.avatar}" alt="${currentUser.name}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1px solid var(--color-gold);">`
-      : `<span style="font-size: 1.2rem;">👤</span>`;
+      ? `<img src="${currentUser.avatar}" alt="${currentUser.name}" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-gold);">`
+      : `<div style="width: 35px; height: 35px; border-radius: 50%; background: var(--color-gold); display: flex; align-items: center; justify-content: center; color: var(--color-bg); font-weight: bold;">${(currentUser.name || 'A').charAt(0).toUpperCase()}</div>`;
 
     navAuth.innerHTML = `
-      <div class="user-menu" style="display: flex; align-items: center; gap: 10px;">
-        <div class="nav-avatar">${avatarHtml}</div>
+      <div class="user-menu">
         <span class="user-name">${currentUser.name || currentUser.email}</span>
-        <button class="btn-profile" onclick="goToProfile()">Perfil</button>
-        ${currentUser.role === 'admin' ? '<button class="btn-admin" onclick="goToAdmin()">Admin</button>' : ''}
-        <button class="btn-logout" onclick="logout()">Sair</button>
+        <button class="nav-avatar-btn" onclick="toggleUserDropdown(event)">
+          ${avatarHtml}
+        </button>
+        <div class="user-dropdown" id="userDropdown">
+          <button class="dropdown-item" onclick="goToProfile()">👤 Perfil</button>
+          ${currentUser.role === 'admin' ? '<button class="dropdown-item" onclick="goToAdmin()">🛡️ Admin</button>' : ''}
+          <button class="dropdown-item logout" onclick="logout()">🚪 Sair</button>
+        </div>
       </div>
     `;
   } else {
@@ -313,6 +317,21 @@ function updateActiveNav() {
     }
   });
 }
+
+// ─── User Dropdown Logic ──────────────────────────────────────────────────────
+function toggleUserDropdown(e) {
+  e.stopPropagation();
+  const dropdown = document.getElementById('userDropdown');
+  if (dropdown) dropdown.classList.toggle('active');
+}
+
+// Close dropdown when clicking outside
+window.addEventListener('click', () => {
+  const dropdown = document.getElementById('userDropdown');
+  if (dropdown && dropdown.classList.contains('active')) {
+    dropdown.classList.remove('active');
+  }
+});
 
 // ─── Initialize ────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
