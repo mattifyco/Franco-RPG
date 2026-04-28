@@ -471,6 +471,7 @@ font-size:.9rem;
   /* Admin Mobile Adjustments */
   .admin-container {
     grid-template-columns: 1fr;
+    padding: 0.5rem;
   }
 
   .admin-sidebar {
@@ -497,6 +498,49 @@ font-size:.9rem;
 
   .admin-menu-item.active {
     border-bottom-color: var(--color-gold);
+  }
+
+  /* Tabelas Responsivas */
+  .admin-table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-size: 0.8rem;
+  }
+
+  .admin-table th, .admin-table td {
+    padding: 0.5rem;
+    min-width: 100px;
+  }
+
+  .admin-actions {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .admin-btn {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.75rem;
+    width: 100%;
+  }
+
+  /* Modais Responsivos */
+  .modal-content {
+    width: 95% !important;
+    margin: 10px auto;
+    padding: 1rem;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .form-group input, .form-group select, .form-group textarea {
+    font-size: 1rem; /* Evita zoom automático no iOS */
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
 

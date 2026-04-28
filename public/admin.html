@@ -478,6 +478,13 @@ Salvar
           <label style="margin-bottom: 0;">Pode editar Blog?</label>
         </div>
         <div class="form-group">
+          <label>Nível de Acesso (Admin)</label>
+          <select id="editUserRole">
+            <option value="user">Usuário Comum</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+        <div class="form-group">
           <label>Foto de Perfil</label>
           <input type="file" id="editUserAvatar" accept="image/*">
         </div>
@@ -827,6 +834,7 @@ this.files[0]?.name ||
       document.getElementById('editUserEventRole').value = user.event_role || '';
       document.getElementById('editUserEventsAttended').value = user.events_attended || 0;
       document.getElementById('editUserCanEditBlog').checked = user.can_edit_blog === 1;
+      document.getElementById('editUserRole').value = user.role || 'user';
       document.getElementById('editUserModal').classList.add('active');
     }
 
@@ -847,6 +855,7 @@ this.files[0]?.name ||
       formData.append('event_role', document.getElementById('editUserEventRole').value);
       formData.append('events_attended', document.getElementById('editUserEventsAttended').value);
       formData.append('can_edit_blog', document.getElementById('editUserCanEditBlog').checked ? 1 : 0);
+      formData.append('role', document.getElementById('editUserRole').value);
       
       const file = document.getElementById('editUserAvatar').files[0];
       if (file) formData.append('avatar', file);
