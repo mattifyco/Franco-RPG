@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meu Perfil - Franco RPG</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .profile-container {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .profile-card {
+      background: linear-gradient(145deg, var(--color-bg-tertiary), var(--color-bg-secondary));
+      border: 1px solid var(--color-border);
+      border-radius: 1rem;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 1rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--color-gold), var(--color-crimson));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      border: 3px solid var(--color-gold);
+      overflow: hidden;
+    }
+
+    .profile-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .profile-name {
+      font-size: 1.5rem;
+      color: var(--color-gold);
+      margin-bottom: 0.5rem;
+    }
+
+    .profile-email {
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .profile-bio {
+      color: var(--color-text);
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+      font-style: italic;
+    }
+
+    .profile-rank {
+      color: var(--color-gold);
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .profile-position {
+      color: var(--color-text-muted);
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+    }
+
+    .profile-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--color-border);
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stat-label {
+      color: var(--color-text-muted);
+    }
+
+    .stat-value {
+      color: var(--color-gold);
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+
+    .ranking-section {
+      background: linear-gradient(145deg, var(--color-bg-tertiary), var(--color-bg-secondary));
+      border: 1px solid var(--color-border);
+      border-radius: 1rem;
+      padding: 2rem;
+    }
+
+    .ranking-title {
+      color: var(--color-gold);
+      margin-bottom: 1.5rem;
+      font-size: 1.3rem;
+    }
+
+    .ranking-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem;
+      background: var(--color-bg-secondary);
+      border-radius: 0.5rem;
+      margin-bottom: 0.75rem;
+      border-left: 3px solid var(--color-gold);
+    }
+
+    .ranking-position {
+      font-size: 1.1rem;
+      color: var(--color-gold);
+      font-weight: 700;
+      min-width: 30px;
+    }
+
+    .ranking-name {
+      flex: 1;
+      margin-left: 1rem;
+      color: var(--color-text);
+    }
+
+    .ranking-points {
+      color: var(--color-gold);
+      font-weight: 600;
+    }
+
+    .modal-edit {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-edit.active {
+      display: flex;
+    }
+
+    .modal-edit-content {
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: 1rem;
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-edit-close {
+      float: right;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--color-text-muted);
+    }
+
+    .modal-edit-close:hover {
+      color: var(--color-gold);
+    }
+
+    .edit-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      clear: both;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      color: var(--color-gold);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      padding: 0.75rem;
+      background: var(--color-bg-tertiary);
+      border: 1px solid var(--color-border);
+      border-radius: 0.5rem;
+      color: var(--color-text);
+      font-family: var(--font-sans);
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .form-actions button {
+      flex: 1;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    /* Chat Styles */
+    .chat-section {
+      margin-top: 2rem;
+      background: linear-gradient(145deg, var(--color-bg-tertiary), var(--color-bg-secondary));
+      border: 1px solid var(--color-border);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      height: 400px;
+      grid-column: 1 / -1;
+    }
+
+    .chat-header {
+      color: var(--color-gold);
+      font-weight: 700;
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+      padding-right: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .chat-message {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+
+    .chat-msg-avatar {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      background: var(--color-gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .chat-msg-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .chat-msg-content {
+      background: var(--color-bg-secondary);
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--color-border);
+      max-width: 80%;
+    }
+
+    .chat-msg-user {
+      color: var(--color-gold);
+      font-weight: 700;
+      font-size: 0.8rem;
+      margin-bottom: 0.25rem;
+      display: block;
+    }
+
+    .chat-msg-text {
+      font-size: 0.9rem;
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+
+    .chat-msg-time {
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .chat-input-area {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .chat-input-area input {
+      flex: 1;
+      padding: 0.75rem;
+      background: var(--color-bg-tertiary);
+      border: 1px solid var(--color-border);
+      border-radius: 0.5rem;
+      color: var(--color-text);
+    }
+
+    .chat-send-btn {
+      padding: 0.75rem 1.5rem;
+      background: var(--color-gold);
+      color: var(--color-bg-primary);
+      border: none;
+      border-radius: 0.5rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .chat-send-btn:hover {
+      opacity: 0.8;
+    }
+
+    @media (max-width: 768px) {
+      .profile-container {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="navbar-content">
+        <a href="/" class="logo">
+          <span class="logo-icon">⚔️</span>
+          <span class="logo-text">FRANCO<span class="logo-rpg">RPG</span></span>
+        </a>
+        
+        <div class="nav-links">
+          <a href="/" class="nav-link">Início</a>
+          <a href="/mesas" class="nav-link">Mesas</a>
+          <a href="/herois" class="nav-link">Nossos Heróis</a>
+          <a href="/blog" class="nav-link">Blog</a>
+        </div>
+
+        <div class="nav-auth">
+          <button class="btn-login" onclick="logout()">Sair</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Profile Section -->
+  <section class="section" style="margin-top: 70px;">
+    <div class="container">
+      <h1 class="section-title">Meu Perfil</h1>
+      
+      <div class="profile-container">
+        <!-- Profile Card -->
+        <div>
+          <div class="profile-card">
+            <div class="profile-avatar" id="profileAvatar">👤</div>
+            <h2 class="profile-name" id="profileName">Carregando...</h2>
+            <p class="profile-email" id="profileEmail">-</p>
+            <p class="profile-bio" id="profileBio"></p>
+            <p class="profile-rank" id="profileRank">Patente: -</p>
+            <p class="profile-position" id="profilePosition">Cargo: -</p>
+            <p class="profile-event-role" id="profileEventRole" style="color: var(--color-text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Cargo no Evento: -</p>
+            <button class="btn btn-gold" style="width: 100%; margin-top: 1rem;" onclick="openEditModal()">✏️ Editar Perfil</button>
+            <button id="blogEditorBtn" class="btn btn-crimson" style="width: 100%; margin-top: 0.5rem; display: none;" onclick="location.href='/blog-editor'">📝 Editor de Blog</button>
+            
+            <div class="profile-stats">
+              <div class="stat-row">
+                <span class="stat-label">Pontos Totais</span>
+                <span class="stat-value" id="totalPoints">0</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Posição no Ranking</span>
+                <span class="stat-value" id="ranking">-</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Mesas Participadas</span>
+                <span class="stat-value" id="tablesCount">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ranking Section -->
+        <div>
+        <div class="ranking-section">
+          <h2 class="ranking-title">🏆 Top Aventureiros</h2>
+          <div id="rankingList">
+            <p style="color: var(--color-text-muted); text-align: center;">Carregando ranking...</p>
+          </div>
+        </div>
+
+        <!-- Minhas Propostas -->
+        <div class="ranking-section" style="margin-top: 2rem;">
+          <h2 class="ranking-title">📩 Minhas Propostas de Mesas</h2>
+          <div id="myProposalsList">
+            <p style="color: var(--color-text-muted); text-align: center;">Carregando propostas...</p>
+          </div>
+        </div>
+      </div>
+
+        <!-- Chat Section -->
+        <div class="chat-section">
+          <div class="chat-header">💬 Chat Geral da Taverna</div>
+          <div class="chat-messages" id="chatMessages">
+            <p style="color: var(--color-text-muted); text-align: center; font-size: 0.8rem;">Carregando mensagens...</p>
+          </div>
+          <form class="chat-input-area" onsubmit="sendChatMessage(event)">
+            <input type="text" id="chatInput" placeholder="Digite sua mensagem..." autocomplete="off" required>
+            <button type="submit" class="chat-send-btn">Enviar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Edit Profile Modal -->
+  <div class="modal-edit" id="editProfileModal">
+    <div class="modal-edit-content">
+      <span class="modal-edit-close" onclick="closeEditModal()">&times;</span>
+      <h2 style="color: var(--color-gold); margin-bottom: 1.5rem;">Editar Perfil</h2>
+      <form class="edit-form" id="editProfileForm" onsubmit="saveProfile(event)">
+        <div class="form-group">
+          <label>Nome de Usuário</label>
+          <input type="text" id="editName" required>
+        </div>
+        <div class="form-group">
+          <label>Bio</label>
+          <textarea id="editBio" placeholder="Conte um pouco sobre você..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Foto de Perfil</label>
+          <input type="file" id="editAvatar" accept="image/*">
+          <small style="color: var(--color-text-muted); margin-top: 0.25rem;">Deixe em branco para manter a foto atual</small>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-cancel" onclick="closeEditModal()">Cancelar</button>
+          <button type="submit" class="btn btn-submit">Salvar Alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/main.js"></script>
+  <script>
+    let currentUserId = null;
+    let chatAutoRefresh = null;
+
+    // Verificar se o usuário está logado
+    function checkUserLoggedIn() {
+      const userStr = localStorage.getItem('user');
+      if (!userStr) {
+        window.location.href = '/';
+        return null;
+      }
+      try {
+        const user = JSON.parse(userStr);
+        return user.id || user.userId;
+      } catch (e) {
+        console.error('Erro ao parsear user:', e);
+        window.location.href = '/';
+        return null;
+      }
+    }
+
+    // Carregar dados do perfil do banco de dados
+    async function loadProfile() {
+      currentUserId = checkUserLoggedIn();
+      if (!currentUserId) return;
+
+      try {
+        const response = await fetch(`/api/profile/${currentUserId}`);
+        if (!response.ok) throw new Error('Erro ao carregar perfil');
+        
+        const profile = await response.json();
+
+        // Atualizar interface com dados do banco de dados
+        document.getElementById('profileName').textContent = profile.name || 'Aventureiro';
+        document.getElementById('profileEmail').textContent = profile.email || '-';
+        document.getElementById('profileBio').textContent = profile.bio || 'Nenhuma bio adicionada ainda.';
+        document.getElementById('totalPoints').textContent = profile.points || 0;
+        document.getElementById('profileRank').textContent = `Patente: ${profile.rank || 'Aventureiro'}`;
+        document.getElementById('profilePosition').textContent = `Cargo: ${profile.position || '-'}`;
+        document.getElementById('profileEventRole').textContent = `Cargo no Evento: ${profile.event_role || '-'}`;
+        document.getElementById('tablesCount').textContent = profile.events_attended || 0;
+
+        if (profile.avatar) {
+          document.getElementById('profileAvatar').innerHTML = `<img src="${profile.avatar}" alt="${profile.name}">`;
+        } else {
+          document.getElementById('profileAvatar').innerHTML = '👤';
+        }
+
+        if (profile.role === 'admin' || profile.can_edit_blog === 1) {
+          document.getElementById('blogEditorBtn').style.display = 'block';
+        }
+
+        await loadRanking();
+      } catch (error) {
+        console.error('Erro ao carregar perfil:', error);
+        document.getElementById('profileName').textContent = 'Erro ao carregar';
+      }
+    }
+
+    // Carregar propostas do usuário
+    async function loadMyProposals() {
+      try {
+        const response = await fetch(`/api/proposals/user/${currentUserId}`);
+        const proposals = await response.json();
+        const list = document.getElementById('myProposalsList');
+        
+        if (!proposals || proposals.length === 0) {
+          list.innerHTML = '<p style="color: var(--color-text-muted); text-align: center;">Você ainda não enviou nenhuma proposta.</p>';
+          return;
+        }
+
+        list.innerHTML = proposals.map(p => `
+          <div style="background: var(--color-bg-secondary); border: 1px solid var(--color-border); border-radius: 0.5rem; padding: 1rem; margin-bottom: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <strong style="color: var(--color-gold);">${p.title}</strong>
+              <span style="font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 1rem; font-weight: 600; 
+                ${p.status === 'pending' ? 'background: rgba(212, 175, 55, 0.2); color: var(--color-gold);' : 
+                  p.status === 'accepted' ? 'background: rgba(0, 128, 0, 0.2); color: #4caf50;' : 
+                  'background: rgba(139, 0, 0, 0.2); color: var(--color-crimson);'}">
+                ${p.status === 'pending' ? 'Pendente' : p.status === 'accepted' ? 'Aceita' : 'Negada'}
+              </span>
+            </div>
+            ${p.rejection_reason ? `
+              <div style="font-size: 0.8rem; color: var(--color-crimson); background: rgba(139, 0, 0, 0.1); padding: 0.5rem; border-radius: 0.3rem; margin-top: 0.5rem;">
+                <strong>Motivo da recusa:</strong> ${p.rejection_reason}
+              </div>
+            ` : ''}
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Erro ao carregar propostas:', error);
+      }
+    }
+
+    // Carregar ranking
+    async function loadRanking() {
+      try {
+        const response = await fetch('/api/ranking');
+        if (!response.ok) throw new Error('Erro ao carregar ranking');
+        
+        const ranking = await response.json();
+        const list = document.getElementById('rankingList');
+        
+        if (!ranking || ranking.length === 0) {
+          list.innerHTML = '<p style="color: var(--color-text-muted); text-align: center;">Nenhum usuário no ranking ainda</p>';
+          return;
+        }
+
+        list.innerHTML = ranking.slice(0, 10).map((u, i) => `
+          <div class="ranking-item">
+            <span class="ranking-position">#${i + 1}</span>
+            <span class="ranking-name">${u.name}</span>
+            <span class="ranking-points">${u.points} pts</span>
+          </div>
+        `).join('');
+
+        const userRank = ranking.findIndex(u => u.id === parseInt(currentUserId)) + 1;
+        document.getElementById('ranking').textContent = userRank > 0 ? `#${userRank}` : '-';
+      } catch (error) {
+        console.error('Erro ao carregar ranking:', error);
+      }
+    }
+
+    // Abrir modal de edição
+    function openEditModal() {
+      document.getElementById('editName').value = document.getElementById('profileName').textContent;
+      const bioText = document.getElementById('profileBio').textContent;
+      document.getElementById('editBio').value = bioText === 'Nenhuma bio adicionada ainda.' ? '' : bioText;
+      document.getElementById('editAvatar').value = '';
+      document.getElementById('editProfileModal').classList.add('active');
+    }
+
+    // Fechar modal de edição
+    function closeEditModal() {
+      document.getElementById('editProfileModal').classList.remove('active');
+    }
+
+    // Salvar perfil no banco de dados
+    async function saveProfile(e) {
+      e.preventDefault();
+      
+      const formData = new FormData();
+      formData.append('name', document.getElementById('editName').value);
+      formData.append('bio', document.getElementById('editBio').value);
+      
+      const file = document.getElementById('editAvatar').files[0];
+      if (file) formData.append('avatar', file);
+
+      try {
+        const response = await fetch(`/api/profile/${currentUserId}`, {
+          method: 'PUT',
+          body: formData
+        });
+
+        if (response.ok) {
+          alert('Perfil atualizado com sucesso!');
+          
+          // Atualizar o localStorage para refletir as mudanças (especialmente o avatar)
+          const userStr = localStorage.getItem('user');
+          if (userStr) {
+            const user = JSON.parse(userStr);
+            user.name = document.getElementById('editName').value;
+            // Se houver um novo avatar, o servidor não retorna a URL aqui, 
+            // então recarregamos o perfil completo para pegar a URL correta
+            const profileRes = await fetch(`/api/profile/${currentUserId}`);
+            const updatedProfile = await profileRes.json();
+            user.avatar = updatedProfile.avatar;
+            localStorage.setItem('user', JSON.stringify(user));
+          }
+
+          closeEditModal();
+          await loadProfile();
+          // Forçar atualização da navbar se a função existir
+          if (typeof updateNavAuth === 'function') updateNavAuth();
+        } else {
+          const error = await response.json();
+          alert('Erro ao atualizar perfil: ' + (error.error || 'Erro desconhecido'));
+        }
+      } catch (error) {
+        console.error('Erro ao salvar perfil:', error);
+        alert('Erro de conexão ao atualizar perfil');
+      }
+    }
+
+    // Carregar chat
+    async function loadChat() {
+      try {
+        const response = await fetch('/api/chat');
+        if (!response.ok) throw new Error('Erro ao carregar chat');
+        
+        const messages = await response.json();
+        const container = document.getElementById('chatMessages');
+        
+        if (!messages || messages.length === 0) {
+          container.innerHTML = '<p style="color: var(--color-text-muted); text-align: center; font-size: 0.8rem;">Nenhuma mensagem ainda. Comece a conversa!</p>';
+          return;
+        }
+
+        container.innerHTML = messages.map(msg => {
+          const date = new Date(msg.created_at);
+          const time = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+          return `
+            <div class="chat-message">
+              <div class="chat-msg-avatar">
+                ${msg.user_avatar ? `<img src="${msg.user_avatar}" alt="${msg.user_name}">` : '👤'}
+              </div>
+              <div class="chat-msg-content">
+                <span class="chat-msg-user">${msg.user_name}</span>
+                <div class="chat-msg-text">${escapeHtml(msg.content)}</div>
+                <div class="chat-msg-time">${time}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+        
+        container.scrollTop = container.scrollHeight;
+      } catch (error) {
+        console.error('Erro ao carregar chat:', error);
+      }
+    }
+
+    // Enviar mensagem no chat
+    async function sendChatMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById('chatInput');
+      const content = input.value.trim();
+      if (!content || !currentUserId) return;
+
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: currentUserId, content })
+        });
+
+        if (response.ok) {
+          input.value = '';
+          await loadChat();
+        }
+      } catch (error) {
+        console.error('Erro ao enviar mensagem:', error);
+      }
+    }
+
+    // Escapar HTML para segurança
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Logout
+    function logout() {
+      if (chatAutoRefresh) clearInterval(chatAutoRefresh);
+      localStorage.removeItem('user');
+      window.location.href = '/';
+    }
+
+    // Inicializar página
+    document.addEventListener('DOMContentLoaded', () => {
+      loadProfile();
+      loadMyProposals();
+      loadChat();
+      chatAutoRefresh = setInterval(loadChat, 4000);
+    });
+
+    // Limpar ao sair da página
+    window.addEventListener('beforeunload', () => {
+      if (chatAutoRefresh) clearInterval(chatAutoRefresh);
+    });
+  </script>
+</body>
+</html>
