@@ -689,22 +689,15 @@ this.files[0]?.name ||
         const tbody = document.getElementById('tablesTable');
         tbody.innerHTML = tables.map(table => `
           <tr>
-            <td>${table.title}</td>
-            <td>${table.system}</td>
-            <td>${table.narrator_name || '-'}</td>
-            <td>${table.current_players}/${table.max_players}</td>
+            <td data-label="Título">${table.title}</td>
+            <td data-label="Sistema">${table.system}</td>
+            <td data-label="Narrador">${table.narrator_name || '-'}</td>
+            <td data-label="Jogadores">${table.current_players}/${table.max_players}</td>
             <td>
               <div class="admin-actions">
-   <button class="admin-btn"
-      onclick="openEditTableModal(${table.id})">
-      Editar
-   </button>
-
-   <button class="admin-btn delete"
-      onclick="deleteTable(${table.id})">
-      Deletar
-   </button>
-</div>
+                <button class="admin-btn" onclick="openEditTableModal(${table.id})">Editar</button>
+                <button class="admin-btn delete" onclick="deleteTable(${table.id})">Deletar</button>
+              </div>
             </td>
           </tr>
         `).join('');
@@ -720,11 +713,11 @@ this.files[0]?.name ||
         const tbody = document.getElementById('usersTable');
         tbody.innerHTML = users.map(user => `
           <tr>
-            <td>${user.name}</td>
-            <td>${user.email}</td>
-            <td>${user.points}</td>
-            <td>${user.rank || '-'}</td>
-            <td>${user.position || '-'}</td>
+            <td data-label="Nome"><a href="/perfil?id=${user.id}" style="color: var(--color-gold); font-weight: bold;">${user.name}</a></td>
+            <td data-label="Email">${user.email}</td>
+            <td data-label="Pontos">${user.points}</td>
+            <td data-label="Patente">${user.rank || '-'}</td>
+            <td data-label="Cargo">${user.position || '-'}</td>
             <td>
               <div class="admin-actions">
                 <button class="admin-btn" onclick="openEditUserModal(${user.id})">Editar</button>
@@ -745,12 +738,12 @@ this.files[0]?.name ||
         const tbody = document.getElementById('heroesTable');
         tbody.innerHTML = heroes.map(hero => `
           <tr>
-            <td>${hero.name}</td>
-            <td>${hero.role || '-'}</td>
-            <td>${hero.handle || '-'}</td>
+            <td data-label="Nome">${hero.name}</td>
+            <td data-label="Função">${hero.role || '-'}</td>
+            <td data-label="Handle">${hero.handle || '-'}</td>
             <td>
               <div class="admin-actions">
-                <button class="admin-btn delete" onclick="deleteHero(${hero.id})">Deletar</button>
+                <button class="admin-btn delete" onclick="deleteHero(${hero.id})">Excluir</button>
               </div>
             </td>
           </tr>

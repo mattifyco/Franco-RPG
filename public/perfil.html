@@ -375,10 +375,9 @@
     </div>
   </nav>
 
-  <!-- Profile Section -->
-  <section class="section" style="margin-top: 70px;">
+  <!-- Profile Section  <section class="section" style="margin-top: 70px;">
     <div class="container">
-      <h1 class="section-title">Meu Perfil</h1>
+      <h1 class="section-title" id="pageTitle">Meu Perfil</h1>
       
       <div class="profile-container">
         <!-- Profile Card -->
@@ -391,10 +390,11 @@
             <p class="profile-rank" id="profileRank">Patente: -</p>
             <p class="profile-position" id="profilePosition">Cargo: -</p>
             <p class="profile-event-role" id="profileEventRole" style="color: var(--color-text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Cargo no Evento: -</p>
-            <button class="btn btn-gold" style="width: 100%; margin-top: 1rem;" onclick="openEditModal()">✏️ Editar Perfil</button>
-            <button id="blogEditorBtn" class="btn btn-crimson" style="width: 100%; margin-top: 0.5rem; display: none;" onclick="location.href='/blog-editor'">📝 Editor de Blog</button>
-            
-            <div class="profile-stats">
+            <div id="ownerActions" style="display: none;">
+              <button class="btn btn-gold" style="width: 100%; margin-top: 1rem;" onclick="openEditModal()">✏️ Editar Perfil</button>
+              <button id="blogEditorBtn" class="btn btn-crimson" style="width: 100%; margin-top: 0.5rem; display: none;" onclick="window.location.href='/blog-editor'">✍️ Editor do Blog</button>
+            </div>
+          </div>      <div class="profile-stats">
               <div class="stat-row">
                 <span class="stat-label">Pontos Totais</span>
                 <span class="stat-value" id="totalPoints">0</span>
@@ -486,27 +486,35 @@
       try {
         const user = JSON.parse(userStr);
         return user.id || user.userId;
-      } catch (e) {
-        console.error('Erro ao parsear user:', e);
-        window.location.href = '/';
-        return null;
-      }
+      } catch (e    const urlParams = new URLSearchParams(window.location.search);
+    const profileIdFromUrl = urlParams.get('id');
+    
+    let loggedInUserId = null;
+    const user = localStorage.getItem('user');
+    if (user) {
+      loggedInUserId = JSON.parse(user).id;
+    } else if (!profileIdFromUrl) {
+      // Se não estiver logado e não houver ID na URL, volta pra home
+      window.location.href = '/';
     }
 
-    // Carregar dados do perfil do banco de dados
-    async function loadProfile() {
-      currentUserId = checkUserLoggedIn();
-      if (!currentUserId) return;
+    // O ID que vamos carregar é o da URL ou o do logado
+    const targetUserId = profileIdFromUrl || loggedInUserId;
+    const isMyProfile = !profileIdFromUrl || profileIdFromUrl == loggedInUserId;
 
+    let chatAutoRefresh = null;
+
+    // Carregar dados do perfil
+    async function loadProfile() {
       try {
-        const response = await fetch(`/api/profile/${currentUserId}`);
+        const response = await fetch(`/api/profile/${targetUserId}`);
         if (!response.ok) throw new Error('Erro ao carregar perfil');
         
         const profile = await response.json();
 
-        // Atualizar interface com dados do banco de dados
+        // Atualizar interface
         document.getElementById('profileName').textContent = profile.name || 'Aventureiro';
-        document.getElementById('profileEmail').textContent = profile.email || '-';
+        document.getElementById('profileEmail').textContent = profile.email || 'E-mail privado';
         document.getElementById('profileBio').textContent = profile.bio || 'Nenhuma bio adicionada ainda.';
         document.getElementById('totalPoints').textContent = profile.points || 0;
         document.getElementById('profileRank').textContent = `Patente: ${profile.rank || 'Aventureiro'}`;
@@ -520,21 +528,29 @@
           document.getElementById('profileAvatar').innerHTML = '👤';
         }
 
-        if (profile.role === 'admin' || profile.can_edit_blog === 1) {
-          document.getElementById('blogEditorBtn').style.display = 'block';
+        // Mostrar ações de dono (editar) apenas se for o meu perfil
+        if (isMyProfile) {
+          document.getElementById('pageTitle').textContent = 'Meu Perfil';
+          document.getElementById('ownerActions').style.display = 'block';
+          if (profile.role === 'admin' || profile.can_edit_blog === 1) {
+            document.getElementById('blogEditorBtn').style.display = 'block';
+          }
+        } else {
+          document.getElementById('pageTitle').textContent = 'Perfil do Aventureiro';
+          document.getElementById('ownerActions').style.display = 'none';
         }
 
         await loadRanking();
       } catch (error) {
         console.error('Erro ao carregar perfil:', error);
-        document.getElementById('profileName').textContent = 'Erro ao carregar';
+        document.getElementById('profileName').textContent = 'Usuário não encontrado';
       }
     }
 
     // Carregar propostas do usuário
     async function loadMyProposals() {
       try {
-        const response = await fetch(`/api/proposals/user/${currentUserId}`);
+        const response = await fetch(`/api/proposals/user/${targetUserId}`);
         const proposals = await response.json();
         const list = document.getElementById('myProposalsList');
         
@@ -581,14 +597,14 @@
         }
 
         list.innerHTML = ranking.slice(0, 10).map((u, i) => `
-          <div class="ranking-item">
+          <div class="ranking-item" onclick="window.location.href='/perfil?id=${u.id}'" style="cursor: pointer;">
             <span class="ranking-position">#${i + 1}</span>
             <span class="ranking-name">${u.name}</span>
             <span class="ranking-points">${u.points} pts</span>
           </div>
         `).join('');
 
-        const userRank = ranking.findIndex(u => u.id === parseInt(currentUserId)) + 1;
+        const userRank = ranking.findIndex(u => u.id === parseInt(targetUserId)) + 1;
         document.getElementById('ranking').textContent = userRank > 0 ? `#${userRank}` : '-';
       } catch (error) {
         console.error('Erro ao carregar ranking:', error);
@@ -621,7 +637,7 @@
       if (file) formData.append('avatar', file);
 
       try {
-        const response = await fetch(`/api/profile/${currentUserId}`, {
+        const response = await fetch(`/api/profile/${loggedInUserId}`, {
           method: 'PUT',
           body: formData
         });
@@ -636,7 +652,7 @@
             user.name = document.getElementById('editName').value;
             // Se houver um novo avatar, o servidor não retorna a URL aqui, 
             // então recarregamos o perfil completo para pegar a URL correta
-            const profileRes = await fetch(`/api/profile/${currentUserId}`);
+            const profileRes = await fetch(`/api/profile/${loggedInUserId}`);
             const updatedProfile = await profileRes.json();
             user.avatar = updatedProfile.avatar;
             localStorage.setItem('user', JSON.stringify(user));
@@ -675,11 +691,11 @@
           const time = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
           return `
             <div class="chat-message">
-              <div class="chat-msg-avatar">
+              <div class="chat-msg-avatar" onclick="window.location.href='/perfil?id=${msg.user_id}'" style="cursor: pointer;">
                 ${msg.user_avatar ? `<img src="${msg.user_avatar}" alt="${msg.user_name}">` : '👤'}
               </div>
               <div class="chat-msg-content">
-                <span class="chat-msg-user">${msg.user_name}</span>
+                <span class="chat-msg-user" onclick="window.location.href='/perfil?id=${msg.user_id}'" style="cursor: pointer;">${msg.user_name}</span>
                 <div class="chat-msg-text">${escapeHtml(msg.content)}</div>
                 <div class="chat-msg-time">${time}</div>
               </div>
@@ -704,7 +720,7 @@
         const response = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ user_id: currentUserId, content })
+          body: JSON.stringify({ user_id: loggedInUserId, content })
         });
 
         if (response.ok) {
