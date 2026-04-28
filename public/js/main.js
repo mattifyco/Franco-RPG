@@ -2,7 +2,7 @@
 const loginModal = document.getElementById('loginModal');
 const loginForm = document.getElementById('loginForm');
 const registerForm = document.getElementById('registerForm');
-const mobileMenu = document.getElementById('mobileMenu');
+let mobileMenu = document.getElementById('mobileMenu');
 
 // ─── Auth State ────────────────────────────────────────────────────────────────
 let currentUser = null;
@@ -41,6 +41,7 @@ function updateNavAuth() {
           ${currentUser.role === 'admin' ? '<button class="dropdown-item" onclick="goToAdmin()">🛡️ Admin</button>' : ''}
           <button class="dropdown-item logout" onclick="logout()">🚪 Sair</button>
         </div>
+        <button class="btn-menu" onclick="toggleMobileMenu(event)">☰</button>
       </div>
     `;
   } else {
@@ -77,8 +78,13 @@ function switchTab(tab) {
   }
 }
 
-function toggleMobileMenu() {
-  mobileMenu.classList.toggle('active');
+function toggleMobileMenu(e) {
+  if (e) e.stopPropagation();
+  if (!mobileMenu) mobileMenu = document.getElementById('mobileMenu');
+  if (mobileMenu) mobileMenu.classList.toggle('active');
+  // Fecha o dropdown de usuário se abrir o menu mobile
+  const dropdown = document.getElementById('userDropdown');
+  if (dropdown) dropdown.classList.remove('active');
 }
 
 // Close modal on click outside
@@ -325,16 +331,45 @@ function toggleUserDropdown(e) {
   if (dropdown) dropdown.classList.toggle('active');
 }
 
-// Close dropdown when clicking outside
+// Close dropdowns when clicking outside
 window.addEventListener('click', () => {
   const dropdown = document.getElementById('userDropdown');
   if (dropdown && dropdown.classList.contains('active')) {
     dropdown.classList.remove('active');
   }
+  if (mobileMenu && mobileMenu.classList.contains('active')) {
+    mobileMenu.classList.remove('active');
+  }
 });
+
+// ─── Ensure Mobile Menu Exists ──────────────────────────────────────────────────
+function ensureMobileMenu() {
+  let menu = document.getElementById('mobileMenu');
+  if (!menu) {
+    menu = document.createElement('div');
+    menu.id = 'mobileMenu';
+    menu.className = 'mobile-menu';
+    menu.innerHTML = `
+      <a href="/" class="mobile-link">Início</a>
+      <a href="/mesas" class="mobile-link">Mesas</a>
+      <a href="/herois" class="mobile-link">Nossos Heróis</a>
+      <a href="/blog" class="mobile-link">Blog</a>
+    `;
+    document.body.appendChild(menu);
+    mobileMenu = menu;
+    
+    // Re-bind click events for new links
+    menu.querySelectorAll('.mobile-link').forEach(link => {
+      link.addEventListener('click', () => {
+        menu.classList.remove('active');
+      });
+    });
+  }
+}
 
 // ─── Initialize ────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  ensureMobileMenu();
   checkAuth();
   updateActiveNav();
   loadFeaturedTables();
