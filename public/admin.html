@@ -356,16 +356,23 @@
 
           <!-- Heróis -->
           <div class="admin-section" id="heroes">
-            <h2 style="color: var(--color-gold); margin-bottom: 1.5rem;">Gerenciar Heróis</h2>
-            <form class="admin-form" id="heroForm" onsubmit="createHero(event)">
+            <h2 style="color: var(--color-gold); margin-bottom: 1.5rem;" id="heroSectionTitle">Gerenciar Heróis</h2>
+            <form class="admin-form" id="heroForm" onsubmit="saveHero(event)">
+              <input type="hidden" id="editHeroId">
               <input type="text" placeholder="Nome do Herói" id="heroName" required>
               <input type="text" placeholder="Cargo/Role" id="heroRole" required>
               <input type="text" placeholder="Handle (@usuario)" id="heroHandle">
               <input type="number" placeholder="Anos Jogando" id="heroYearsPlaying">
               <input type="number" placeholder="Anos Narrando" id="heroYearsNarrating">
-              <input type="file" id="heroImage" accept="image/*">
+              <div class="form-group">
+                <label style="color: var(--color-gold); font-size: 0.8rem;">Foto do Herói (Opcional)</label>
+                <input type="file" id="heroImage" accept="image/*">
+              </div>
               <textarea id="heroBio" placeholder="Biografia do herói" required></textarea>
-              <button type="submit">Adicionar Herói</button>
+              <div style="display: flex; gap: 1rem;">
+                <button type="submit" id="heroSubmitBtn" style="flex: 2;">Adicionar Herói</button>
+                <button type="button" id="heroCancelBtn" onclick="resetHeroForm()" style="flex: 1; background: var(--color-text-muted); display: none;">Cancelar</button>
+              </div>
             </form>
             <table class="admin-table">
               <thead>
@@ -743,6 +750,7 @@ this.files[0]?.name ||
             <td data-label="Handle">${hero.handle || '-'}</td>
             <td>
               <div class="admin-actions">
+                <button class="admin-btn" onclick="openEditHeroModal(${hero.id})">Editar</button>
                 <button class="admin-btn delete" onclick="deleteHero(${hero.id})">Excluir</button>
               </div>
             </td>
@@ -784,8 +792,9 @@ this.files[0]?.name ||
       }
     }
 
-    async function createHero(e) {
+    async function saveHero(e) {
       e.preventDefault();
+      const heroId = document.getElementById('editHeroId').value;
       const name = document.getElementById('heroName').value;
       const role = document.getElementById('heroRole').value;
       const handle = document.getElementById('heroHandle').value;
@@ -803,15 +812,50 @@ this.files[0]?.name ||
       heroFormData.append('years_narrating', years_narrating);
       if (file) heroFormData.append('avatar', file);
 
-      const response = await fetch('/api/heroes', {
-        method: 'POST',
+      const url = heroId ? `/api/heroes/${heroId}` : '/api/heroes';
+      const method = heroId ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method: method,
         body: heroFormData
       });
 
       if (response.ok) {
-        alert('Herói criado!');
+        alert(heroId ? 'Herói atualizado!' : 'Herói criado!');
+        resetHeroForm();
         loadHeroes();
       }
+    }
+
+    async function openEditHeroModal(id) {
+      try {
+        const response = await fetch(`/api/heroes/${id}`);
+        const hero = await response.json();
+        
+        document.getElementById('editHeroId').value = hero.id;
+        document.getElementById('heroName').value = hero.name;
+        document.getElementById('heroRole').value = hero.role || '';
+        document.getElementById('heroHandle').value = hero.handle || '';
+        document.getElementById('heroYearsPlaying').value = hero.years_playing || '';
+        document.getElementById('heroYearsNarrating').value = hero.years_narrating || '';
+        document.getElementById('heroBio').value = hero.bio || '';
+        
+        document.getElementById('heroSectionTitle').textContent = '📝 Editando Herói: ' + hero.name;
+        document.getElementById('heroSubmitBtn').textContent = 'Salvar Alterações';
+        document.getElementById('heroCancelBtn').style.display = 'block';
+        
+        window.scrollTo(0, document.getElementById('heroForm').offsetTop - 100);
+      } catch (error) {
+        console.error('Erro ao carregar herói:', error);
+      }
+    }
+
+    function resetHeroForm() {
+      document.getElementById('editHeroId').value = '';
+      document.getElementById('heroForm').reset();
+      document.getElementById('heroSectionTitle').textContent = 'Gerenciar Heróis';
+      document.getElementById('heroSubmitBtn').textContent = 'Adicionar Herói';
+      document.getElementById('heroCancelBtn').style.display = 'none';
     }
 
     async function openEditUserModal(id) {

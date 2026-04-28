@@ -129,11 +129,14 @@
   <script>
     async function loadBlog() {
       try {
+        console.log('Carregando blog...');
         const response = await fetch('/api/blog');
+        if (!response.ok) throw new Error('Erro ao buscar posts');
         const posts = await response.json();
+        console.log('Posts carregados:', posts);
         const container = document.getElementById('blogContainer');
 
-        if (posts.length === 0) {
+        if (!posts || posts.length === 0) {
           container.innerHTML = '<p class="loading">Nenhuma postagem disponível no momento</p>';
           return;
         }

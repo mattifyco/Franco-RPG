@@ -180,6 +180,7 @@
             <div class="editor-actions">
               <button type="button" class="btn-action btn-save" onclick="savePost(0)">💾 Salvar Rascunho</button>
               <button type="button" class="btn-action btn-publish" onclick="savePost(1)">🚀 Publicar</button>
+              <button type="button" id="deletePostBtn" class="btn-action" style="background: var(--color-crimson); color: white; display: none;" onclick="deletePost()">🗑️ Excluir</button>
             </div>
           </form>
         </div>
@@ -272,6 +273,9 @@
       document.getElementById('postContent').value = p.content;
       document.getElementById('postCategory').value = p.category;
       coverImageUrl = p.cover_image;
+      
+      document.getElementById('deletePostBtn').style.display = 'block';
+
       if (p.cover_image) {
         document.getElementById('coverPreview').innerHTML = `<img src="${p.cover_image}">`;
       } else {
@@ -280,11 +284,24 @@
       window.scrollTo(0, 0);
     }
 
+    async function deletePost() {
+      if (!currentPostId) return;
+      if (!confirm('Tem certeza que deseja excluir este post?')) return;
+
+      const res = await fetch(`/api/blog/${currentPostId}`, { method: 'DELETE' });
+      if (res.ok) {
+        alert('Post excluído com sucesso!');
+        clearForm();
+        loadPosts();
+      }
+    }
+
     function clearForm() {
       currentPostId = null;
       coverImageUrl = null;
       document.getElementById('blogForm').reset();
       document.getElementById('coverPreview').innerHTML = '📷';
+      document.getElementById('deletePostBtn').style.display = 'none';
     }
 
     document.addEventListener('DOMContentLoaded', () => {
