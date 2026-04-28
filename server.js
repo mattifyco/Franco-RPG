@@ -131,6 +131,21 @@ app.get('/api/profile/:id', async (req, res) => {
     .single();
 
   if (error || !data) return res.status(404).json({ error: 'Usuário não encontrado' });
+  
+  // Lógica de Privacidade
+  const userCookie = req.cookies.user;
+  let isOwnerOrAdmin = false;
+  if (userCookie) {
+    const loggedInUser = JSON.parse(userCookie);
+    if (loggedInUser.id == id || loggedInUser.role === 'admin') {
+      isOwnerOrAdmin = true;
+    }
+  }
+
+  if (!isOwnerOrAdmin) {
+    delete data.email;
+  }
+
   res.json(data);
 });
 
